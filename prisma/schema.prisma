@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String   @unique
+  name      String
+  password  String
+  scores    Score[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  questions Question[]
+  scores    Score[]
+}
+
+model Question {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  title          String
+  answersOptions String[]
+  correctAnswer  String
+  category       Category @relation(fields: [categoryId], references: [id])
+  categoryId     Int
+}
+
+model Score {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  score      Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
