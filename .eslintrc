@@ -19,6 +19,10 @@
     "prettier"
   ],
   "rules": {
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "no-unused-vars": "warn",
+    "no-unused-expressions": [
+      "error", { "allowTernary": true }
+    ]
   }
 }
