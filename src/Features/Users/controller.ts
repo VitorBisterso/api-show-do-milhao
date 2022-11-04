@@ -4,7 +4,11 @@ import jwt from 'jsonwebtoken';
 
 import { prisma } from '@/index';
 import { internalError, isEmailValid, throwError } from '@/Utils';
-import { getCreationErr, getMinLengthErr } from '@/Utils/messages';
+import {
+  getCreationErr,
+  getMinLengthErr,
+  getNotFoundErr,
+} from '@/Utils/messages';
 
 import { JWT_SECRET_KEY } from '@/env';
 
@@ -60,9 +64,11 @@ export async function login(
 ) {
   const { email, password } = req.body;
 
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUnique({
     where: { email },
   });
+
+  if (!user) return throwError(res, 404, getNotFoundErr('user'));
 
   bcrypt.compare(password, user.password, (error, equal) => {
     if (error) return internalError(res);
