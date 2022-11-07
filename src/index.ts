@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 
 import UsersRoutes from '@/Features/Users';
@@ -9,6 +10,7 @@ export const prisma = new PrismaClient();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use(`${API_BASEPATH}/users`, UsersRoutes);
 app.use(`${API_BASEPATH}/questions`, QuestionsRoutes);
