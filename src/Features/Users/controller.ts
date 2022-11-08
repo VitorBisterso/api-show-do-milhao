@@ -27,7 +27,7 @@ export async function register(
   if (name && name.length < 3)
     return throwError(res, 422, getMinLengthErr('name', 3));
 
-  if (!isEmailValid(email)) return throwError(res, 422, 'Invalid email');
+  if (!isEmailValid(email)) return throwError(res, 422, 'Email inválido');
 
   if (password && password.length < 5)
     return throwError(res, 422, getMinLengthErr('password', 5));
@@ -35,7 +35,7 @@ export async function register(
   const user = await prisma.user.findUnique({
     where: { email },
   });
-  if (user) return throwError(res, 403, 'User already exists!');
+  if (user) return throwError(res, 403, 'Usuário já existente!');
 
   bcrypt.hash(password, 10, (error, hash) => {
     if (error) return internalError(res);
@@ -74,7 +74,7 @@ export async function login(
     if (error) return internalError(res);
 
     if (!equal) {
-      const errorMessage = 'Wrong password';
+      const errorMessage = 'Credenciais inválidas';
       return throwError(res, 400, errorMessage);
     }
 

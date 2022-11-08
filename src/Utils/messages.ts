@@ -1,15 +1,15 @@
 export function getMinLengthErr(field: string, length: number) {
-  return `Field ${field} must be at least ${length} characters long`;
+  return `O campo ${field} deve ter um mínimo de ${length} caracteres`;
 }
 
 export function getCreationErr(entity: string, error: Error) {
-  return `Could not create ${entity}: ${error}`;
+  return `Falha ao criar ${entity}: ${error}`;
 }
 
 export function getRequiredFieldErr(field: string) {
-  return `Field ${field} is required`;
+  return `O campo ${field} é obrigatório`;
 }
 
 export function getNotFoundErr(entity: string) {
-  return `Could not find any ${entity} with the given params`;
+  return `Não foi possível encontrar nenhum ${entity} com os dados fornecidos`;
 }

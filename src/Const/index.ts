@@ -1,3 +1,4 @@
 export const API_BASEPATH = '/api';
 
-export const INTERNAL_ERROR = 'Sorry! Something went wrong. Try again later.';
+export const INTERNAL_ERROR =
+  'Sinto muito! Algo deu errado. Tente novamente mais tarde...';
