@@ -12,7 +12,7 @@ export function category(req: Request, res: Response) {
 
     prisma.category
       .findMany()
-      .then((category: any) => res.json({ category }))
+      .then((categories: any) => res.json({ categories }))
       .catch(() => internalError(res));
   });
 }
