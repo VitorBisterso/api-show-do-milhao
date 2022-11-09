@@ -5,6 +5,6 @@ import { category } from './controller';
 
 const router = express.Router();
 
-router.route('/categories').get(verifyToken, category);
+router.route('/').get(verifyToken, category);
 
 export default router;
