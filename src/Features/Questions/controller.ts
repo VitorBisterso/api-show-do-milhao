@@ -31,7 +31,7 @@ export async function quiz(
 
     prisma.question
       .findMany({ take: 10, where: { categoryId } })
-      .then(questions => res.json({ questions }))
+      .then((questions: any) => res.json({ questions }))
       .catch(() => internalError(res));
   });
 }
