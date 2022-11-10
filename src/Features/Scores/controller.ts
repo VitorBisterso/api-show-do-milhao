@@ -3,11 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { prisma } from '@/index';
 import { internalError, throwError } from '@/Utils';
-import {
-  getCreationErr,
-  getNotFoundErr,
-  getRequiredFieldErr,
-} from '@/Utils/messages';
+import { getCreationErr, getRequiredFieldErr } from '@/Utils/messages';
 
 import { JWT_SECRET_KEY } from '@/env';
 
@@ -17,11 +13,20 @@ type ScoreBody = {
   score: number;
 };
 
-function checkParameters(param1: string, param2: string, param3: number) {
+type ListScore = {
+  userEmail: string;
+  categoryName: string;
+};
+
+function checkParameters(
+  param1: string = '1',
+  param2: string = '2',
+  param3: number = 1
+) {
   let res: string = '';
-  if (!param1) res += 'categoryName ';
-  if (!param2) res += 'userEmail';
-  if (!param3) res += 'score';
+  if (param1.length === 0) res += 'categoryName ';
+  if (param2.length === 0) res += 'userEmail';
+  if (param3 === null) res += 'score';
   return res;
 }
 
@@ -33,7 +38,8 @@ export async function register(
     if (error) return res.sendStatus(401);
     const { categoryName, userEmail, score } = req.body;
     const validator: string = checkParameters(categoryName, userEmail, score);
-    if (!validator) return throwError(res, 422, getRequiredFieldErr(validator));
+    if (validator.length !== 0)
+      return throwError(res, 422, getRequiredFieldErr(validator));
     const category = await prisma.category.findUnique({
       where: { name: categoryName },
     });
@@ -55,6 +61,41 @@ export async function register(
   });
 }
 
-export function list(req: Request<unknown, unknown, ScoreBody>, res: Response) {
-  //
+export function list(req: Request<unknown, unknown, ListScore>, res: Response) {
+  return jwt.verify(req.token, JWT_SECRET_KEY, async error => {
+    if (error) return res.sendStatus(401);
+    const { userEmail, categoryName } = req.body;
+    const validator: string = checkParameters(userEmail, categoryName);
+    if (validator.length !== 0)
+      return throwError(res, 422, getRequiredFieldErr(validator));
+    const category = await prisma.category.findUnique({
+      where: { name: categoryName },
+    });
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+    });
+    prisma.score
+      .findMany({
+        where: { userId: user.id, categoryId: category.id },
+        orderBy: {
+          score: 'asc',
+        },
+      })
+      .then((scores: any) => res.json({ scores }))
+      .catch(() => internalError(res));
+  });
+}
+
+export function rank(req: Request, res: Response) {
+  return jwt.verify(req.token, JWT_SECRET_KEY, async error => {
+    if (error) return res.sendStatus(401);
+    prisma.score
+      .findMany({
+        orderBy: {
+          score: 'asc',
+        },
+      })
+      .then((scores: any) => res.json({ scores }))
+      .catch(() => internalError(res));
+  });
 }
