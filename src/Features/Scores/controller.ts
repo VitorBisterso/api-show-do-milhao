@@ -78,7 +78,7 @@ export function list(req: Request<unknown, unknown, ListScore>, res: Response) {
       .findMany({
         where: { userId: user.id, categoryId: category.id },
         orderBy: {
-          score: 'asc',
+          score: 'desc',
         },
       })
       .then((scores: any) => res.json({ scores }))
@@ -92,7 +92,7 @@ export function rank(req: Request, res: Response) {
     prisma.score
       .findMany({
         orderBy: {
-          score: 'asc',
+          score: 'desc',
         },
       })
       .then((scores: any) => res.json({ scores }))
