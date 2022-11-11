@@ -48,8 +48,10 @@ export async function register(
           password: hash,
         },
       })
-      .then(user => res.status(201).json({ user }))
-      .catch(error => throwError(res, 500, getCreationErr('user', error)));
+      .then((user: any) => res.status(201).json({ user }))
+      .catch((error: any) =>
+        throwError(res, 500, getCreationErr('user', error))
+      );
   });
 }
 
