@@ -46,6 +46,7 @@ export async function register(
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
     });
+    if (!category || !user) return internalError(res);
     prisma.score
       .create({
         data: {
@@ -74,6 +75,7 @@ export function list(req: Request<unknown, unknown, ListScore>, res: Response) {
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
     });
+    if (!category || !user) return internalError(res);
     prisma.score
       .findMany({
         where: { userId: user.id, categoryId: category.id },
