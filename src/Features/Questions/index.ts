@@ -5,6 +5,6 @@ import { quiz } from './controller';
 
 const router = express.Router();
 
-router.route('/quiz').get(verifyToken, quiz);
+router.route('/quiz/:categoryId').get(verifyToken, quiz);
 
 export default router;
