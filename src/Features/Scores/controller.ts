@@ -9,7 +9,7 @@ import { JWT_SECRET_KEY } from '@/env';
 
 type ScoreBody = {
   userEmail: string;
-  categoryName: string;
+  categoryId: string;
   score: number;
 };
 
@@ -18,12 +18,8 @@ type ListScore = {
   categoryName: string;
 };
 
-function checkParameters(
-  param1: string = '1',
-  param2: string = '2',
-  param3: number = 1
-) {
-  let res: string = '';
+function checkParameters(param1 = '1', param2 = '2', param3 = 1) {
+  let res = '';
   if (param1.length === 0) res += 'categoryName ';
   if (param2.length === 0) res += 'userEmail';
   if (param3 === null) res += 'score';
@@ -36,23 +32,22 @@ export async function register(
 ) {
   return jwt.verify(req.token, JWT_SECRET_KEY, async error => {
     if (error) return res.sendStatus(401);
-    const { categoryName, userEmail, score } = req.body;
-    const validator: string = checkParameters(categoryName, userEmail, score);
+    const { categoryId, userEmail, score } = req.body;
+
+    const validator: string = checkParameters(categoryId, userEmail, score);
     if (validator.length !== 0)
       return throwError(res, 422, getRequiredFieldErr(validator));
-    const category = await prisma.category.findUnique({
-      where: { name: categoryName },
-    });
+
     const user = await prisma.user.findUnique({
       where: { email: userEmail },
     });
-    if (!category || !user) return internalError(res);
+    if (!user) return internalError(res);
     prisma.score
       .create({
         data: {
           score,
           userId: user.id,
-          categoryId: category.id,
+          categoryId: Number(categoryId),
         },
       })
       .then((score: any) => res.status(201).json({ score }))
@@ -91,10 +86,27 @@ export function list(req: Request<unknown, unknown, ListScore>, res: Response) {
 export function rank(req: Request, res: Response) {
   return jwt.verify(req.token, JWT_SECRET_KEY, async error => {
     if (error) return res.sendStatus(401);
+
+    const includeUser = {
+      select: {
+        email: true,
+        name: true,
+      },
+    };
+    const includeCategory = {
+      select: {
+        name: true,
+      },
+    };
+
     prisma.score
       .findMany({
         orderBy: {
           score: 'desc',
+        },
+        include: {
+          user: includeUser,
+          category: includeCategory,
         },
       })
       .then((scores: any) => res.json({ scores }))
